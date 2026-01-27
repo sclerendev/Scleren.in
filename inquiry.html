@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>INQUIRY TERMINAL | Scleren Developer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="inner-page">
+
+  <div id="bg"></div>
+  <div class="zoom-overlay"></div>
+
+  <!-- Navigation consistent with main site -->
+  <div class="top-ribbon at-top">
+  <div class="ribbon-inner">
+    
+    <div class="ribbon-brand">
+      <a href="index.html" class="logo-small">SCLEREN</a>
+      <span class="system-status">
+        <span class="status-dot"></span> 
+        <span class="page-id">ARCHIVE_GAMES.EXE</span> </span>
+    </div>
+
+    <nav class="ribbon-nav">
+      <a href="index.html" class="nav-link-minimal">
+        <span class="nav-arrow">←</span> Home
+      </a>
+    </nav>
+
+    <div class="menu-wrapper">
+      <div class="menu-dots" id="menuToggle">
+        <span></span><span></span><span></span>
+      </div>
+      
+      <div class="menu-dropdown" id="menuDropdown">
+        <a href="index.html">01. HOME</a>
+        <a href="about.html">02. ABOUT Studio</a>
+        <a href="games.html">03. GAMES</a>
+        <a href="services.html">04. SERVICES</a>
+        <a href="inquiry.html">05. CONTACT</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+  <main class="content monolith">
+
+    <div class="mono-header">
+      <span>TERMINAL SESSION — INQUIRY UPLINK</span>
+      <span>2026-01-27 17:23 UTC+5:30</span>
+    </div>
+
+    <h1 class="mono-title">ESTABLISH<br/>SECURE CHANNEL</h1>
+
+    <div class="mono-meta">STATUS: AWAITING CONNECTION • CONFIDENTIAL</div>
+
+    <p class="mono-lead">
+      Strategic partnerships • Technical consulting • High-signal collaborations only.
+    </p>
+
+    <p class="mono-body">
+      Currently accepting select inquiries from individuals and organizations seeking deep technical collaboration, 
+      systems architecture advisory, or early-stage product co-development.<br><br>
+      
+      <strong>Expected first response:</strong> within 48–72 hours (business days).<br>
+      <strong>High-priority / time-sensitive:</strong> please include [URGENT] in subject line.
+    </p>
+
+    <!-- Primary contact method – most professional & spam-resistant -->
+    <section class="mono-section uplink">
+      <h2 class="mono-subtitle">UPLINK PROTOCOL</h2>
+      
+      <div class="contact-block">
+        <div class="contact-label">DESTINATION</div>
+        <a href="mailto:sclerendev@gmail.com?subject=[INQUIRY]" class="mono-address">
+          sclerendev@gmail.com
+        </a>
+        <div class="contact-hint">Preferred method. Use clear subject line.</div>
+      </div>
+
+      <div class="contact-block secondary">
+        <div class="contact-label">ALTERNATE CHANNEL</div>
+        <p class="mono-address inactive">[Secure messaging / calendly link coming soon]</p>
+        <div class="contact-hint dim">Matrix / Signal / Keybase — upon mutual agreement</div>
+      </div>
+    </section>
+
+    <!-- Optional micro-form for very low-friction inquiries -->
+    <section class="mono-section form-section">
+      <h2 class="mono-subtitle">QUICK PING</h2>
+      <p class="mono-meta small">For very brief initial outreach (1–2 sentences max)</p>
+
+      <form class="terminal-form" action="https://formspree.io/f/your-form-id" method="POST">
+        <label class="form-label">ORIGIN:</label>
+        <input type="email" name="email" placeholder="your@domain.com" required autocomplete="email">
+
+        <label class="form-label">SUBJECT:</label>
+        <input type="text" name="_subject" placeholder="Partnership / Consulting / Other" required>
+
+        <label class="form-label">PAYLOAD:</label>
+        <textarea name="message" rows="5" placeholder="Brief overview of your inquiry... (Markdown supported)" required></textarea>
+
+        <!-- Honeypot spam protection -->
+        <input type="text" name="_gotcha" style="display:none">
+
+        <button type="submit" class="btn-cyber">TRANSMIT →</button>
+      </form>
+    </section>
+
+    <div class="mono-action">
+      <a href="mailto:sclerendev@gmail.com?subject=[INQUIRY]">OPEN MAIL CLIENT →</a>
+    </div>
+
+  </main>
+
+  <!-- Bottom Navigation -->
+    <div class="page-navigation" style="margin: 140px auto 100px; max-width: 1100px; padding: 0 30px;">
+      <div style="display: flex; gap: 32px; flex-wrap: wrap; justify-content: center;">
+        <a href="index.html"     class="btn-outline">← Home</a>
+        <a href="about.html"     class="btn-outline">← About Studio</a>
+        <a href="games.html"  class="btn-outline">← Games</a>
+        <a href="services.html"   class="btn-outline">← Services</a>
+      </div>
+    </div>
+
+  <footer>
+    <p>© 2026 Scleren Developer • Classified Transmission</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

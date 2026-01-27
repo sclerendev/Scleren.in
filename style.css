@@ -1,0 +1,1648 @@
+/* =========================================
+   1. RESET & VARIABLES
+   ========================================= */
+:root {
+  --bg-dark: #050505;
+  --bg-panel: rgba(20, 20, 20, 0.75);
+  --gold-primary: #fffd98;
+  --gold-dim: #c8cb8d;
+  --gold-glow: rgba(255, 253, 152, 0.18);
+  --text-main: #e0e0e0;
+  --text-muted: #888;
+  --border-light: rgba(255, 255, 255, 0.08);
+  --border-gold: rgba(255, 253, 152, 0.25);
+  --font-main: 'Arial', sans-serif;
+  --font-mono: 'Courier New', monospace;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  background-color: var(--bg-dark);
+  /* FIX: Prevents layout shift by reserving scrollbar space without forcing a flicker */
+  scrollbar-gutter: stable; 
+  overflow-x: hidden;
+}
+
+/* =========================================
+   2. BACKGROUND & LAYOUT
+   ========================================= */
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Star Container */
+#bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.star {
+  position: absolute;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* Performance-friendly Nebula */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, #1a1a00 0%, #050505 100%);
+  opacity: 0.4;
+  z-index: -2;
+  filter: blur(10px);
+  will-change: transform;
+  transform: translateZ(0); 
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #050505; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-dim); }
+
+/* =========================================
+   3. PAGE TRANSITIONS
+   ========================================= */
+.content {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  /* FIX: Changed translateY to scale to prevent triggering temporary scrollbars */
+  animation: pageEnter 0.8s var(--ease-out) forwards;
+}
+
+@keyframes pageEnter {
+  0%   { opacity: 0; transform: scale(0.99); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+/* =========================================
+   4. NAVIGATION – FINAL CLEAN VERSION (2026)
+   ========================================= */
+/* ──────────────────────────────────────────
+   TOP RIBBON – Improved 2025/2026 version
+────────────────────────────────────────── */
+.top-ribbon {
+    position: fixed;
+    inset: 0 auto auto 0;
+    width: 100%;
+    height: 72px;
+    z-index: 200;
+    background: linear-gradient(to bottom, rgba(5,5,5,0.92), rgba(5,5,5,0.68));
+    backdrop-filter: blur(10px) saturate(180%);
+    -webkit-backdrop-filter: blur(10px) saturate(180%);
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.42s var(--ease-out);
+    will-change: transform, background, border-color;
+}
+
+.top-ribbon.hide {
+    transform: translateY(-100%);
+    /* Optional: make it slightly more subtle when hidden */
+    /* opacity: 0.4; */ 
+}
+
+/* ── When scrolled to top ── */
+.top-ribbon.at-top {
+    background: linear-gradient(to bottom, rgba(92, 89, 47, 0.7), rgba(5,5,5,0.45));
+    border-bottom-color: var(--border-gold);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+}
+
+/* ── Container with logo + menu ── */
+.ribbon-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    height: 100%;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.ribbon-nav {
+    flex-grow: 1;
+    margin-left: 50px; /* Space from the logo */
+}
+
+@media (max-width: 768px) {
+    .ribbon-nav {
+        display: none; /* Hide 'Home' text on mobile to save space, logo links home anyway */
+    }
+    .menu-dropdown {
+        right: 20px;
+    }
+}
+
+/* Logo / Brand (very helpful on inner pages!) */
+.logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.9rem;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    color: var(--gold-primary);
+    text-shadow: 0 0 18px rgba(255,253,152,0.28);
+    text-decoration: none;
+    transition: transform 0.4s var(--ease-out);
+}
+
+.logo:hover {
+    transform: scale(1.04);
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .top-ribbon {
+        height: 64px;
+    }
+    .ribbon-inner {
+        padding: 0 20px;
+    }
+    .logo {
+        font-size: 1.6rem;
+    }
+    .menu-wrapper {
+        padding: 0;
+    }
+}
+
+.menu-wrapper {
+  width: auto;
+  height: 100%;
+  padding: 0 32px;                /* breathing room from right edge */
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  pointer-events: auto;
+  position: relative;
+}
+/* 2. The Switch: Hide home link only on the index page */
+body.is-home .ribbon-nav {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+/* 3. Dropdown alignment: Ensure it stays on the right */
+.menu-dropdown {
+    right: 0; /* Aligns with the dots */
+    top: 50px;
+    text-align: left;
+}
+
+.menu-dots {
+  pointer-events: auto !important;
+  margin: 0;
+  /* rest of your .menu-dots styles stay here – animation, spans, .active etc. */
+  width: 36px;
+  height: 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: transform 0.35s var(--ease-out);
+}
+
+.menu-dots span {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--gold-primary);
+  transition: all 0.4s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+}
+
+.menu-dots:hover:not(.active) {
+  transform: rotate(90deg);
+}
+
+.menu-dots.active span {
+  width: 24px;
+  height: 2px;
+  border-radius: 0;
+}
+
+.menu-dots.active span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.menu-dots.active span:nth-child(2) {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+.menu-dots.active span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Container adjustments */
+.ribbon-brand {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.logo-small {
+  font-family: 'Playfair Display', serif;
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: var(--gold-primary);
+  text-decoration: none;
+  letter-spacing: 1px;
+}
+
+/* The "System Online" ticker */
+.system-status {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  background: #50dc8c; /* Live green */
+  border-radius: 50%;
+  box-shadow: 0 0 8px #50dc8c;
+  animation: pulse 2s infinite;
+}
+
+/* Minimalist Back Button */
+.nav-link-minimal {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-main);
+  text-decoration: none;
+  letter-spacing: 2px;
+  padding: 8px 0;
+  border-bottom: 1px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.nav-link-minimal:hover {
+  color: var(--gold-primary);
+  border-bottom: 1px solid var(--gold-primary);
+}
+
+.nav-arrow {
+  margin-right: 8px;
+  transition: transform 0.3s ease;
+  display: inline-block;
+}
+
+.nav-link-minimal:hover .nav-arrow {
+  transform: translateX(-5px);
+}
+
+@keyframes pulse {
+  0% { opacity: 0.4; }
+  50% { opacity: 1; }
+  100% { opacity: 0.4; }
+}
+
+/* ──────────────────────────────────────────
+   MENU DROPDOWN – SINGLE AUTHORITATIVE BLOCK
+   ────────────────────────────────────────── */
+.menu-dropdown {
+  position: absolute;
+  top: 72px;
+  right: 32px;                    /* perfectly aligned with wrapper padding */
+  background: rgba(12, 12, 12, 0.975);
+  border: 1px solid var(--border-gold);
+  border-radius: 5px;
+  min-width: 220px;
+  padding: 8px 0;
+  box-shadow: 0 14px 44px rgba(0,0,0,0.7);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-12px);
+  pointer-events: none;
+  transition: all 0.38s var(--ease-out);
+  z-index: 205;
+}
+
+.menu-dropdown.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.menu-dropdown a {
+  display: block;
+  padding: 14px 28px;
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
+  letter-spacing: 0.4px;
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.menu-dropdown a:hover {
+  background: var(--gold-glow);
+  color: var(--gold-primary);
+  border-left-color: var(--gold-primary);
+  padding-left: 38px;
+}
+
+/* Mobile – full-width feel */
+@media (max-width: 768px) {
+  .menu-wrapper {
+    padding: 0 20px;
+  }
+
+  .menu-dropdown {
+    right: 20px;
+    left: 20px;
+    width: auto;
+    min-width: unset;
+    max-width: calc(100% - 40px);
+  }
+}
+
+/* =========================================
+   MENU DOTS (THE TOGGLE BUTTON)
+   ========================================= */
+.menu-dots {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  z-index: 210;
+  position: relative;
+  pointer-events: auto !important; /* Re-enables clicks */
+  transition: transform 0.35s var(--ease-out);
+}
+
+.menu-dots span {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--gold-primary);
+  transition: all 0.4s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+  pointer-events: none;
+}
+
+/* Hover Effect: Rotating the dots */
+.menu-dots:hover:not(.active) {
+  transform: rotate(90deg);
+}
+
+/* THE "X" ANIMATION (When menu is open) */
+.menu-dots.active span {
+    width: 24px;
+    height: 2px;
+    border-radius: 0;
+}
+
+.menu-dots.active span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.menu-dots.active span:nth-child(2) {
+    opacity: 0;
+    transform: translateX(-10px);
+}
+
+.menu-dots.active span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+/* =========================================
+   MENU DROPDOWN (THE LIST)
+   ========================================= */
+.menu-dropdown {
+  position: absolute;
+  top: 72px; /* Sits exactly under the ribbon */
+  right: 30px;
+  background: rgba(12, 12, 12, 0.98);
+  border: 1px solid var(--border-gold);
+  min-width: 240px;
+  padding: 10px 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition: all 0.4s var(--ease-out);
+  z-index: 205;
+}
+
+.menu-dropdown.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* =========================================
+   MENU DROPDOWN LINKS – SINGLE SOURCE OF TRUTH
+   ========================================= */
+.menu-dropdown a {
+  display: block;
+  padding: 14px 28px;               /* slightly tighter than 18px/30px — feels more premium */
+  text-decoration: none;
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
+  letter-spacing: 0.4px;
+  border-left: 3px solid transparent;
+  transition: all 0.28s ease;
+  white-space: nowrap;
+}
+
+.menu-dropdown a:hover {
+  background: var(--gold-glow);
+  color: var(--gold-primary);
+  border-left-color: var(--gold-primary);
+  padding-left: 36px;               /* nice indent on hover */
+}
+
+.hero {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 160px 24px 100px;     /* ← increased top padding */
+  text-align: center;
+}
+
+
+
+/* =========================================
+   5. HERO & COMPONENTS
+   ========================================= */
+.hero {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+
+.hero-title {
+  font-size: clamp(3rem, 10vw, 7rem);
+  font-weight: 800;
+  letter-spacing: 4px;
+  line-height: 1;
+  text-transform: uppercase;
+  margin-bottom: 100px;
+}
+
+/* ──────────────────────────────────────────
+   IMPROVED GAME CARDS – 2026 edition
+   ────────────────────────────────────────── */
+
+.games-section {
+  padding-top: 180px !important;   /* give space under fixed nav/ribbon if you use it */
+}
+
+.game-card {
+  position: relative;
+  background: rgba(12, 12, 14, 0.78);
+  border: 1px solid var(--border-gold);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.45s var(--ease-out);
+  opacity: 0;
+  transform: translateY(35px);
+  animation: cardEnter 0.9s var(--ease-out) forwards;
+  animation-delay: var(--card-delay, 0s);
+}
+
+@keyframes cardEnter {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.game-card:hover {
+  transform: translateY(-12px);
+  border-color: var(--gold-primary);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6),
+              0 0 0 1px rgba(255,253,152,0.12) inset;
+}
+
+.card-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 20%, var(--gold-glow) 0%, transparent 60%);
+  opacity: 0.15;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+
+.game-card:hover .card-glow {
+  opacity: 0.35;
+}
+
+.card-content {
+  position: relative;
+  z-index: 2;
+  padding: 2.2rem 2rem 2.4rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.status-tag {
+  position: absolute;
+  top: 1.4rem;
+  right: 1.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 2px;
+  padding: 0.35em 0.9em;
+  border-radius: 2px;
+  text-transform: uppercase;
+}
+
+.status-tag.live {
+  background: rgba(80, 220, 140, 0.18);
+  color: #50dc8c;
+  border: 1px solid rgba(80, 220, 140, 0.4);
+}
+
+.status-tag.thinking,
+.status-tag.dev {
+  background: rgba(255, 180, 60, 0.14);
+  color: #ffb43c;
+  border: 1px solid rgba(255, 180, 60, 0.35);
+}
+
+.game-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 4.5vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin: 0.4em 0 0.9em;
+  color: var(--gold-primary);
+  text-shadow: 0 0 14px rgba(255,253,152,0.18);
+}
+
+.game-desc {
+  font-size: 1.05rem;
+  line-height: 1.58;
+  color: #d0d0d0;
+  margin-bottom: 1.6rem;
+  flex-grow: 1;
+}
+
+.game-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1.8rem;
+}
+
+.game-tags span {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  background: rgba(40,40,45,0.6);
+  padding: 0.35em 0.8em;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+/* Make btn-cyber look better on cards */
+.btn-cyber {
+  margin-top: auto;   /* push to bottom */
+  width: fit-content;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .game-card {
+    min-height: 380px;
+  }
+  
+  .card-content {
+    padding: 2rem 1.6rem;
+  }
+}
+
+.brand-gold {
+  color: var(--gold-primary);
+  text-shadow: 0 0 12px rgba(255, 253, 152, 0.4);
+}
+
+.btn-cyber {
+  position: relative;
+  display: inline-flex;
+  padding: 16px 45px;
+  background: transparent;
+  color: var(--gold-primary);
+  box-shadow: inset 0 0 0 1px var(--gold-primary);
+  font-weight: 700;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  transition: all 0.35s var(--ease-out);
+}
+
+.btn-cyber:hover {
+  color: #000;
+  background: var(--gold-primary);
+  transform: translateY(-4px);
+}
+
+/* =========================================
+   UNIQUE INDEX HERO – EDITORIAL SPLIT
+   ========================================= */
+
+/* Update your existing .hero-unique */
+.hero-unique {
+  position: relative;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1.4fr 0.6fr; /* Equal split or 1.2fr 0.8fr */
+  align-items: stretch; 
+  padding: 80px 60px;
+  overflow: hidden; /* Prevents button glow from causing scrollbars */
+}
+
+/* Add or update these styles */
+.hero-center-actions {
+  grid-column: 2; /* Forces it to the right column */
+  display: flex;
+  justify-content: flex-end; /* Align to the right edge */
+  align-items: flex-end;    /* Align to the bottom edge */
+  padding-bottom: 40px;     /* Optional: spacing from the footer/bottom */
+}
+
+/* Update the right-side container */
+.hero-center-actions {
+  grid-column: 2; 
+  display: flex;
+  justify-content: flex-end; /* Align to the right */
+  align-items: flex-end;    /* Align to the bottom */
+  padding-bottom: 60px;     /* Distance from the bottom edge */
+  padding-right: 20px;      /* Distance from the right edge */
+}
+
+/* LEFT BLOCK */
+.hero-left {
+  align-self: center;
+}
+
+.hero-unique .hero-title {
+  font-size: clamp(4rem, 11vw, 9rem);
+  line-height: 0.85;
+  text-align: left;
+  letter-spacing: -4px;
+}
+
+.hero-tagline {
+  margin-top: 20px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 3px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* RIGHT BLOCK */
+.hero-right {
+  position: relative;
+  height: 100%;
+}
+
+/* FLOATING BUTTON */
+.btn-float {
+  position: absolute;
+  bottom: 120px;
+  right: 0;
+  transform: rotate(-90deg);
+  transform-origin: right bottom;
+}
+
+/* Subtle entrance animation */
+.hero-unique .hero-title,
+.hero-tagline,
+.btn-float {
+  animation: heroReveal 1.1s var(--ease-out) forwards;
+  opacity: 0;
+}
+
+.hero-tagline { animation-delay: 0.15s; }
+.btn-float { animation-delay: 0.3s; }
+
+@media (max-width: 768px) {
+  .hero-unique {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Title top, Button bottom */
+    padding: 120px 24px 60px;
+    text-align: left;
+  }
+
+  /* Update your existing .hero-center-actions */
+.hero-center-actions {
+    grid-column: 2; /* Keeps it on the right side */
+    display: flex;
+    justify-content: flex-end; /* Pushes to the RIGHT end */
+    align-items: flex-end;    /* Pushes to the BOTTOM end */
+    padding-bottom: 80px;     /* Adjust distance from footer */
+    padding-right: 0;         /* Removes inner spacing to reach the edge */
+}
+/* Ensure the button group itself doesn't center its children */
+.hero-actions.btn-group-split {
+    align-items: flex-end !important; /* Forces stacked buttons to right-align */
+}
+  
+  .pop-btn {
+    width: 100%; /* Full width buttons look better on mobile */
+    max-width: 320px;
+  }
+}
+
+@keyframes heroReveal {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .hero-unique {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center; /* Center everything on mobile */
+        text-align: center;
+    }
+
+    .hero-center-actions {
+        margin-top: 50px;
+        justify-content: center;
+        align-items: center;
+        padding-bottom: 0;
+    }
+}
+
+/* =========================================
+   ABOUT – EDITORIAL STUDIO STYLE
+   ========================================= */
+
+.about-editorial {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 140px 40px 120px;
+}
+
+.about-title {
+  font-size: clamp(3.5rem, 8vw, 6rem);
+  font-weight: 800;
+  letter-spacing: -3px;
+  text-transform: uppercase;
+  line-height: 0.9;
+  margin-bottom: 30px;
+}
+
+.about-meta {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 3px;
+  color: var(--text-muted);
+  margin-bottom: 60px;
+}
+
+.about-lead {
+  font-size: 1.4rem;
+  line-height: 1.6;
+  max-width: 720px;
+  margin-bottom: 30px;
+}
+
+.about-body {
+  font-size: 1rem;
+  line-height: 1.8;
+  max-width: 760px;
+  color: #cfcfcf;
+  margin-bottom: 80px;
+}
+
+/* Specs */
+.about-specs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(200px, 1fr));
+  gap: 60px;
+  border-top: 1px solid var(--border-light);
+  padding-top: 50px;
+}
+
+.about-specs span {
+  display: block;
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.about-specs strong {
+  font-size: 1.1rem;
+  color: var(--gold-primary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .about-editorial {
+    padding: 120px 25px 80px;
+  }
+
+  .about-specs {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
+/* ACTION BUTTONS */
+
+.about-actions {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 90px;
+}
+
+.btn-outline {
+  position: relative;
+  padding: 16px 45px;
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-main);
+  text-decoration: none;
+  border: 1px solid var(--border-light);
+  transition: all 0.35s var(--ease-out);
+}
+
+.btn-outline:hover {
+  color: var(--gold-primary);
+  border-color: var(--gold-primary);
+  transform: translateY(-3px);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .about-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* =========================================
+   MONOLITH TERMINAL – FINAL FORM
+   ========================================= */
+
+.monolith {
+  position: relative;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 140px 60px 120px;
+  background:
+    linear-gradient(180deg, rgba(16,16,16,0.85), rgba(5,5,5,0.98));
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow:
+    0 60px 120px rgba(0,0,0,0.85),
+    inset 0 0 0 1px rgba(255,253,152,0.04);
+  backdrop-filter: blur(18px);
+}
+
+/* Header strip */
+.mono-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 3px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: 24px;
+  margin-bottom: 80px;
+}
+
+.mono-header span {
+  color: var(--gold-primary);
+}
+
+/* Title */
+.mono-title {
+  font-size: clamp(3.8rem, 9vw, 6.5rem);
+  font-weight: 800;
+  letter-spacing: -3px;
+  line-height: 0.9;
+  text-transform: uppercase;
+  margin-bottom: 30px;
+}
+
+/* Meta */
+.mono-meta {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 3px;
+  color: var(--text-muted);
+  margin-bottom: 60px;
+}
+
+/* Text */
+.mono-lead {
+  font-size: 1.45rem;
+  line-height: 1.6;
+  max-width: 720px;
+  margin-bottom: 30px;
+}
+
+.mono-body {
+  font-size: 1rem;
+  line-height: 1.85;
+  max-width: 760px;
+  color: #cfcfcf;
+  margin-bottom: 90px;
+}
+
+/* Singular action */
+.mono-action a {
+  display: inline-block;
+  padding: 18px 60px;
+  font-size: 0.75rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #000;
+  background: var(--gold-primary);
+  text-decoration: none;
+  transition: all 0.35s var(--ease-out);
+}
+
+.mono-action a:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 50px rgba(255,253,152,0.25);
+}
+
+/* Specs */
+.mono-specs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 70px;
+  margin-top: 120px;
+  padding-top: 50px;
+  border-top: 1px solid var(--border-light);
+}
+
+.mono-specs span {
+  display: block;
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.mono-specs strong {
+  font-size: 1.1rem;
+  color: var(--gold-primary);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .monolith {
+    padding: 120px 30px 90px;
+  }
+
+  .mono-specs {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
+/* ──────────────────────────────────────────
+   INQUIRY / TERMINAL PAGE OVERRIDES
+   ────────────────────────────────────────── */
+
+.inner-page .monolith {
+  border: 1px solid rgba(255,253,152,0.12);
+  box-shadow: 0 80px 160px rgba(0,0,0,0.9),
+              inset 0 0 80px rgba(255,253,152,0.03);
+}
+
+.mono-subtitle {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  letter-spacing: 4px;
+  color: var(--gold-dim);
+  margin: 2.8rem 0 1.4rem;
+  text-transform: uppercase;
+}
+
+.contact-block {
+  margin: 1.8rem 0 2.8rem;
+  padding: 1.4rem 2rem;
+  background: rgba(8,8,12,0.6);
+  border-left: 3px solid var(--border-gold);
+  transition: border-color 0.4s ease;
+}
+
+.contact-block:hover {
+  border-left-color: var(--gold-primary);
+}
+
+.contact-label {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 2.5px;
+  color: var(--text-muted);
+  margin-bottom: 0.6rem;
+  display: block;
+}
+
+.mono-address {
+  font-family: var(--font-mono);
+  font-size: 1.35rem;
+  color: var(--gold-primary);
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+.mono-address:hover {
+  text-shadow: 0 0 18px rgba(255,253,152,0.45);
+  transform: translateX(4px);
+  display: inline-block;
+}
+
+.inactive {
+  color: #555;
+  pointer-events: none;
+}
+
+.contact-hint,
+.contact-hint.dim {
+  font-size: 0.82rem;
+  color: #777;
+  margin-top: 0.6rem;
+  font-style: italic;
+}
+
+.contact-hint.dim { color: #444; }
+
+/* Micro form styling */
+.terminal-form {
+  display: grid;
+  gap: 1.1rem;
+  max-width: 620px;
+  margin: 2rem 0 3rem;
+}
+
+.form-label {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  letter-spacing: 1.8px;
+  color: var(--gold-dim);
+  margin-bottom: 0.4rem;
+  display: block;
+}
+
+.terminal-form input,
+.terminal-form textarea {
+  background: rgba(10,10,14,0.8);
+  border: 1px solid rgba(255,253,152,0.15);
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  padding: 0.9rem 1.2rem;
+  border-radius: 3px;
+  transition: all 0.25s ease;
+}
+
+.terminal-form input:focus,
+.terminal-form textarea:focus {
+  outline: none;
+  border-color: var(--gold-primary);
+  box-shadow: 0 0 0 3px rgba(255,253,152,0.12);
+  background: rgba(15,15,20,0.9);
+}
+
+.terminal-form textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .monolith {
+    padding: 100px 24px 80px;
+  }
+  .mono-title {
+    font-size: clamp(3.2rem, 12vw, 5.2rem);
+  }
+}
+
+.section.full-page {
+  min-height: calc(100vh - 140px);
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 30px;
+}
+
+.games {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 50px;
+  margin-top: 80px;
+}
+
+
+.nav-container {
+  position: fixed;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1100px;
+  max-width: calc(100% - 60px);
+  display: flex;
+  justify-content: flex-start;
+  z-index: 200;
+}
+
+.nav-btn {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  text-decoration:wavy;
+  color: var(--gold-primary);
+  padding: 10px 20px;
+  border: 1px solid var(--border-gold);
+  background: rgba(12,12,12,0.6);
+  transition: all 0.3s var(--ease-out);
+}
+
+.nav-btn:hover {
+  background: var(--gold-primary);
+  color: #000;
+  transform: translateY(-5px);
+}
+
+
+
+footer {  
+  max-width: 1100px;
+  margin: 80px auto 40px;
+  padding: 0 30px;
+  text-align: right;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.about-actions {
+  margin-top: 70px;
+  margin-bottom: 100px;
+}
+
+@media (max-width: 768px) {
+  .nav-container {
+    width: 100%;
+    padding: 0 25px;
+  }
+}
+
+/* =========================================
+   TEXT SELECTION – GOLD THEME
+   ========================================= */
+
+::selection {
+  background: rgba(255, 253, 152, 0.35);
+  color: #000;
+}
+
+::-moz-selection {
+  background: rgba(255, 253, 152, 0.35);
+  color: #000;
+}
+
+/* Secure Blue/Cyan pulse for the Inquiry page */
+.status-dot.secure {
+  background: #00f2ff; /* Cyber Cyan */
+  box-shadow: 0 0 10px #00f2ff;
+}
+
+/* Specific styling for the terminal form to ensure it sits perfectly */
+.terminal-form {
+  border-top: 1px solid var(--border-light);
+  padding-top: 40px;
+  margin-top: 20px;
+}
+
+/* Make the "TRANSMIT" button look extra heavy */
+.terminal-form .btn-cyber {
+  width: 100%;
+  justify-content: center;
+  margin-top: 20px;
+  letter-spacing: 4px;
+}
+
+/* Ensure Monolith content doesn't hit the ribbon on mobile */
+@media (max-width: 768px) {
+  .monolith {
+    margin-top: 100px;
+    padding: 60px 20px;
+  }
+}
+
+/* Container for the split effect */
+.btn-group-split {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 20px;
+  transition: all 0.5s var(--ease-out);
+}
+
+/* Hide extra options by default */
+.split-options {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: flex-end;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.9);
+  transition: all 0.4s var(--ease-out);
+}
+
+/* When the container is active */
+.btn-group-split.active .main-trigger {
+  display: none; /* Hide the original button */
+}
+
+.btn-group-split.active .split-options {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1);
+}
+
+/* Specific styling for the popped buttons */
+.pop-btn {
+  width: 320px;
+  padding: 22px 0;
+  text-align: center;
+  background: rgba(5, 5, 5, 0.95);
+  backdrop-filter: blur(10px);
+  color: var(--gold-primary);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  text-decoration: none;
+  
+  /* Neon Border & Clip-path for "Tech" look */
+  border: 2px solid var(--gold-primary); /* Thicker border */
+  clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+  box-shadow: 0 0 15px rgba(255, 253, 152, 0.1), 
+              inset 0 0 10px rgba(255, 253, 152, 0.05);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s var(--ease-out);
+  animation: buttonPop 0.5s var(--ease-out) forwards;
+} 
+
+/* The Synthwave "Glow" on Hover */
+.pop-btn:hover {
+  background: var(--gold-primary);
+  color: #000;
+  box-shadow: 0 0 20px var(--gold-glow), 
+              0 0 40px rgba(255, 253, 152, 0.1);
+  transform: scale(5.05) translateX(5px);
+}
+
+/* Add a subtle "Scanline" effect to the popped buttons */
+.pop-btn::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: linear-gradient(
+    rgba(255, 255, 255, 0) 50%, 
+    rgba(255, 253, 152, 0.05) 50%
+  );
+  background-size: 100% 4px;
+  pointer-events: none;
+}
+
+.pop-btn.top { animation-delay: 0.1s; }
+.pop-btn.mid { animation-delay: 0.2s; }
+.pop-btn.bottom { animation-delay: 0.3s; }
+
+@keyframes buttonPop {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Adjust the floating button rotation from your original CSS if needed */
+@media (min-width: 769px) {
+  .btn-float.active {
+    transform: rotate(0deg); /* Straighten up when clicked */
+    bottom: 200px;
+  }
+}
+
+@media (min-width: 769px) {
+  .btn-float.active {
+    transform: rotate(0deg); 
+    bottom: 250px; /* Pushed up slightly more to account for 3 buttons */
+    right: 40px;
+  }
+}
+
+/* Mobile Tweak: Stack them neatly with more spacing */
+@media (max-width: 768px) {
+  .split-options {
+    gap: 25px;
+  }
+  .pop-btn {
+    width: 80vw;
+  }
+}
+
+@keyframes buttonPop {
+  0% { 
+    opacity: 0; 
+    transform: translateY(20px) scale(0.8);
+    filter: brightness(2) blur(5px);
+  }
+  70% {
+    transform: translateY(-5px) scale(1.02);
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0) scale(1);
+    filter: brightness(1) blur(0);
+  }
+}
+
+/* Staggered timing for a "loading" sequence */
+.pop-btn.top    { animation-delay: 0.1s; border-color: #ffffff; } /* Hot Pink hint */
+.pop-btn.mid    { animation-delay: 0.2s; border-color: #fbff00; } /* Cyber Cyan hint */
+.pop-btn.bottom { animation-delay: 0.3s; border-color: var(--gold-primary); }
+
+
+/* NEW: Explore Projects - Floating Brand Anchor */
+.explore-projects-fixed {
+  position: fixed;
+  bottom: 50px;
+  left: 60px;
+  z-index: 100;
+  display: flex;
+  align-items:end;
+  gap: 20px;
+  text-decoration: none;
+  
+}
+
+.explore-circle {
+  width: 80px;
+  height: 80px;
+  border: 1px solid var(--border-gold);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.5s var(--ease-out);
+  position: relative;
+}
+
+.explore-circle::after {
+  content: "→";
+  color: var(--gold-primary);
+  font-size: 1.5rem;
+  transition: transform 0.4s var(--ease-out);
+}
+
+.explore-text {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 4px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  transition: color 0.3s ease;
+}
+
+/* Hover Effects */
+.explore-projects-fixed:hover .explore-circle {
+  background: var(--gold-primary);
+  border-color: var(--gold-primary);
+  box-shadow: 0 0 30px var(--gold-glow);
+}
+
+.explore-projects-fixed:hover .explore-circle::after {
+  color: #717700;
+  transform: rotate(-45deg);
+}
+
+.explore-projects-fixed:hover .explore-text {
+  color: var(--gold-primary);
+}
+
+@media (max-width: 768px) {
+  .explore-projects-fixed {
+    bottom: 30px;
+    left: 30px;
+    transform: scale(0.8);
+  }
+}
+
+/* Styling for the active link in the dropdown */
+#menuDropdown a.active-page {
+    color: #fffd98; /* Match your star color */
+    background: rgba(70, 69, 32, 0.16); /* Subtle background glow */
+    border-left: 3px solid #fffd98; /* Accent line */
+    font-weight: bold;
+    pointer-events: none; /* Optional: disable clicking the page you're already on */
+}
+
+/* =========================================
+   LADDER LIGHT SCANNER EFFECT
+   ========================================= */
+
+/* =========================================
+   LADDER LIGHT SCANNER EFFECT
+   ========================================= */
+
+.ladder-char {
+    display: inline-block;
+    color: var(--text-muted); /* The "OFF" state color (dim gray) */
+    opacity: 0.25;            /* The "OFF" state brightness */
+    transform: scale(1);
+    
+    /* The Animation Configuration */
+    /* 3s duration controls how often the loop repeats */
+    animation: ladderScan 3s linear infinite; 
+    
+    /* Stagger the start time based on letter position */
+    animation-delay: calc(var(--delay) * 0.15s);
+}
+
+/* Pause the scanner when hovering over the title */
+.hero-title:hover .ladder-char {
+    color: var(--gold-primary);
+    opacity: 1;
+    text-shadow: 0 0 20px var(--gold-glow);
+    animation: none; /* Stops the blinking so it's readable */
+    transition: all 0.3s ease;
+}
+
+/* The "Light Beam" Keyframes */
+@keyframes ladderScan {
+    0% {
+        color: var(--text-muted);
+        opacity: 0.25;
+        text-shadow: none;
+        transform: scale(1);
+    }
+    
+    /* The "Ignition" point - starts glowing before fully bright */
+    10% {
+        color: var(--gold-primary);
+        opacity: 0.8;
+        transform: scale(1.1);
+    }
+
+    /* The "ON" state - Brightest Flash */
+    20% {
+        color: #ffffff; /* White center hot-spot */
+        opacity: 1;
+        text-shadow: 
+            0 0 10px var(--gold-primary), 
+            0 0 20px var(--gold-primary), 
+            0 0 40px var(--gold-primary); /* Heavy neon glow */
+        transform: scale(1.15);
+    }
+
+    /* Fade out trail */
+    30% {
+        color: var(--gold-primary);
+        opacity: 0.6;
+        transform: scale(1.05);
+        text-shadow: 0 0 10px var(--gold-glow);
+    }
+
+    /* Return to "OFF" state */
+    50%, 100% {
+        color: var(--text-muted);
+        opacity: 0.25;
+        text-shadow: none;
+        transform: scale(1);
+    }
+}
+
+/* =========================================
+   DUAL-COLOR LADDER SCAN (NO HOVER)
+   ========================================= */
+
+/* 1. Define specific colors for the two distinct parts */
+.brand-gold {
+    /* Variables for Gold Text */
+    --scan-color: var(--gold-primary);
+    --scan-glow: rgba(118, 116, 10, 0.8);
+}
+
+.brand-white {
+    /* Variables for White Text */
+    --scan-color: #ffffff;
+    --scan-glow: rgba(255, 255, 255, 0.9);
+}
+
+/* 2. The Character Base Style */
+.ladder-char {
+    display: inline-block;
+    
+    /* Use the variable defined in the parent (.brand-gold or .brand-white) */
+    color: var(--scan-color); 
+    
+    /* Default State: DIM / OFF */
+    opacity: 0.15; 
+    transform: scale(1);
+    will-change: opacity, text-shadow, transform;
+    
+    /* Animation settings */
+    animation: ladderScan 3.5s linear infinite;
+    /* Stagger the delay based on letter position */
+    animation-delay: calc(var(--delay) * 0.12s); 
+}
+
+/* 3. The Animation Keyframes */
+@keyframes ladderScan {
+    0% {
+        opacity: 0.15; /* Dim */
+        text-shadow: none;
+        transform: scale(1);
+    }
+    
+    /* The Flash/Ignition */
+    15% {
+        opacity: 1; /* Bright */
+        /* Intense Glow using the parent's color variable */
+        text-shadow: 
+            0 0 10px var(--scan-glow),
+            0 0 20px var(--scan-glow),
+            0 0 40px var(--scan-glow);
+        transform: scale(1.1); /* Pop out slightly */
+    }
+    
+    /* Trail off */
+    30% {
+        opacity: 0.5;
+        text-shadow: 0 0 10px var(--scan-glow);
+        transform: scale(1.02);
+    }
+
+    /* Back to Dim */
+    50%, 100% {
+        opacity: 0.15;
+        text-shadow: none;
+        transform: scale(1);
+    }
+}
