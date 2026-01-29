@@ -1,12 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
-    
+
     /* -----------------------------------------------
         1. STAR BACKGROUND SYSTEM
     ----------------------------------------------- */
     const initStars = () => {
         const bg = document.getElementById("bg");
         if (!bg) return;
-        
+
         const STAR_COUNT = 80;
         const REPEL_DIST = 150;
         const REPEL_DIST_SQ = REPEL_DIST * REPEL_DIST;
@@ -19,19 +19,21 @@ document.addEventListener('DOMContentLoaded', () => {
             width = window.innerWidth;
             height = window.innerHeight;
         });
-        
+
         for (let i = 0; i < STAR_COUNT; i++) {
             const star = document.createElement("div");
             star.className = "star";
             const chars = ["·", "+", "°"];
             star.textContent = chars[Math.floor(Math.random() * chars.length)];
-            star.style.color = "#fffd98"; 
-            star.style.position = 'absolute';
+            star.style.color = "#fffd98";
+            star.style.position = "absolute";
+
             star.x = Math.random() * width;
             star.y = Math.random() * height;
             star.vx = (Math.random() - 0.5) * 0.5;
-            star.vy = (Math.random() * 0.5) + 0.2; 
+            star.vy = (Math.random() * 0.5) + 0.2;
             star.baseOpacity = Math.random() * 0.4 + 0.1;
+
             bg.appendChild(star);
             stars.push(star);
         }
@@ -48,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
             for (const s of stars) {
                 s.x += s.vx;
                 s.y += s.vy;
+
                 const dx = s.x - mouseX;
                 const dy = s.y - mouseY;
                 const distSq = dx * dx + dy * dy;
@@ -68,7 +71,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (s.x < 0) s.x = width;
 
                 s.vx *= 0.95;
-                if(s.vy < 0.2) s.vy += 0.01; 
+                if (s.vy < 0.2) s.vy += 0.01;
+
                 s.style.transform = `translate3d(${s.x}px, ${s.y}px, 0)`;
                 s.style.opacity = s.baseOpacity;
             }
@@ -78,40 +82,33 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     initStars();
 
-   /* -----------------------------------------------
-        2. MENU TOGGLE (FIXED SELECTORS)
+    /* -----------------------------------------------
+        2. MENU TOGGLE + ACTIVE PAGE
     ----------------------------------------------- */
     const menuToggle = document.getElementById("menuToggle");
-    const menuDropdown = document.getElementById("menuDropdown"); 
-    
+    const menuDropdown = document.getElementById("menuDropdown");
+
     if (menuToggle && menuDropdown) {
-        // --- NEW: Highlight current page ---
-        const highlightActivePage = () => {
-            const currentPath = window.location.pathname;
-            const menuLinks = menuDropdown.querySelectorAll('a');
+        const currentPath = window.location.pathname;
 
-            menuLinks.forEach(link => {
-                const linkPath = link.getAttribute('href');
-                
-                // If current path matches link href exactly, or if at root '/' matches 'index.html'
-                if (currentPath.endsWith(linkPath) || (currentPath === '/' && linkPath === 'index.html')) {
-                    link.classList.add('active-page');
-                } else {
-                    link.classList.remove('active-page');
-                }
-            });
-        };
-        highlightActivePage();
-        // ------------------------------------
+        menuDropdown.querySelectorAll("a").forEach(link => {
+            const linkPath = link.getAttribute("href");
+            if (
+                currentPath.endsWith(linkPath) ||
+                (currentPath === "/" && linkPath === "index.html")
+            ) {
+                link.classList.add("active-page");
+            }
+        });
 
-        menuToggle.addEventListener("click", (e) => {
+        menuToggle.addEventListener("click", e => {
             e.preventDefault();
             e.stopPropagation();
             menuDropdown.classList.toggle("open");
             menuToggle.classList.toggle("active");
         });
 
-        document.addEventListener("click", (e) => {
+        document.addEventListener("click", e => {
             if (!menuDropdown.contains(e.target) && !menuToggle.contains(e.target)) {
                 menuDropdown.classList.remove("open");
                 menuToggle.classList.remove("active");
@@ -120,21 +117,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /* -----------------------------------------------
-        3. PAGE TRANSITIONS
+        3. PAGE TRANSITIONS (SAFE)
     ----------------------------------------------- */
-    document.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', e => {
-            const href = link.getAttribute('href');
-            // Check if it's a real internal link
-            if (href && !href.startsWith('#') && !href.startsWith('mailto:') && link.hostname === window.location.hostname) {
-                e.preventDefault();
-                const content = document.querySelector('.content');
-                if(content) content.classList.add('fade-out');
-                
-                setTimeout(() => {
-                    window.location.href = href;
-                }, 500); 
-            }
+    document.querySelectorAll("a").forEach(link => {
+        link.addEventListener("click", e => {
+            const href = link.getAttribute("href");
+
+            // 🚫 Do NOT intercept mail, Gmail, or external links
+            if (
+                !href ||
+                href.startsWith("#") ||
+                href.startsWith("mailto:") ||
+                href.startsWith("https://mail.google.com") ||
+                link.hostname !== window.location.hostname
+            ) return;
+
+            e.preventDefault();
+
+            const content = document.querySelector(".content");
+            if (content) content.classList.add("fade-out");
+
+            setTimeout(() => {
+                window.location.href = href;
+            }, 500);
         });
     });
 
@@ -143,71 +148,157 @@ document.addEventListener('DOMContentLoaded', () => {
     ----------------------------------------------- */
     let lastScrollY = window.scrollY;
     let isHidden = false;
-    const RIBBON = document.querySelector('.top-ribbon');
+    const RIBBON = document.querySelector(".top-ribbon");
 
     if (RIBBON) {
-        const handleScroll = () => {
+        window.addEventListener("scroll", () => {
             const currentScrollY = window.scrollY;
-            const SCROLL_THRESHOLD = 10;
-            const TOP_THRESHOLD = 120;
+            if (Math.abs(currentScrollY - lastScrollY) < 10) return;
 
-            if (Math.abs(currentScrollY - lastScrollY) < SCROLL_THRESHOLD) return;
-
-            if (currentScrollY > lastScrollY && currentScrollY > TOP_THRESHOLD) {
+            if (currentScrollY > lastScrollY && currentScrollY > 120) {
                 if (!isHidden) {
-                    RIBBON.classList.add('hide');
+                    RIBBON.classList.add("hide");
                     isHidden = true;
                 }
             } else {
                 if (isHidden) {
-                    RIBBON.classList.remove('hide');
+                    RIBBON.classList.remove("hide");
                     isHidden = false;
                 }
             }
             lastScrollY = currentScrollY;
-        };
-        window.addEventListener('scroll', handleScroll, { passive: true });
+        }, { passive: true });
     }
 
     /* -----------------------------------------------
-        5. HERO EXPLORE SPLIT SYSTEM
+        5. HERO SPLIT SYSTEM
     ----------------------------------------------- */
-    const exploreTrigger = document.getElementById('exploreTrigger');
-    const heroContainer = document.getElementById('heroActionContainer');
+    const exploreTrigger = document.getElementById("exploreTrigger");
+    const heroContainer = document.getElementById("heroActionContainer");
 
     if (exploreTrigger && heroContainer) {
-        exploreTrigger.addEventListener('click', (e) => {
+        exploreTrigger.addEventListener("click", e => {
             e.preventDefault();
             e.stopPropagation();
-            heroContainer.classList.toggle('active');
-            
-            // Adjust parent rotation if it exists
-            const parent = heroContainer.closest('.btn-float');
+            heroContainer.classList.toggle("active");
+
+            const parent = heroContainer.closest(".btn-float");
             if (parent) {
-                parent.style.transform = heroContainer.classList.contains('active') ? 'rotate(0deg)' : 'rotate(-90deg)';
+                parent.style.transform = heroContainer.classList.contains("active")
+                    ? "rotate(0deg)"
+                    : "rotate(-90deg)";
             }
         });
 
-        // Close split buttons when clicking outside
-        document.addEventListener('click', (e) => {
+        document.addEventListener("click", e => {
             if (!heroContainer.contains(e.target)) {
-                heroContainer.classList.remove('active');
-                const parent = heroContainer.closest('.btn-float');
-                if (parent) parent.style.transform = 'rotate(-90deg)';
+                heroContainer.classList.remove("active");
+                const parent = heroContainer.closest(".btn-float");
+                if (parent) parent.style.transform = "rotate(-90deg)";
             }
         });
     }
-});
 
-document.addEventListener("DOMContentLoaded", () => {
-    // Selects both the gold "Scleren" and white "Developer" text spans
-    const titleSpans = document.querySelectorAll(".hero-title span");
-
-    titleSpans.forEach(span => {
+    /* -----------------------------------------------
+        6. HERO TITLE LADDER EFFECT
+    ----------------------------------------------- */
+    document.querySelectorAll(".hero-title span").forEach(span => {
         const text = span.innerText;
-        span.innerHTML = text.split("").map((char, index) => {
-            // --delay is used by CSS to stagger the lights
-            return `<span class="ladder-char" style="--delay: ${index}">${char}</span>`;
-        }).join("");
+        span.innerHTML = text
+            .split("")
+            .map((char, i) =>
+                `<span class="ladder-char" style="--delay:${i}">${char}</span>`
+            ).join("");
     });
+
 });
+
+/* -----------------------------------------------
+    7. GMAIL OPEN FUNCTION (INQUIRY PAGE)
+----------------------------------------------- */
+function openGmail(e) {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value.trim();
+    const subject = document.getElementById("subject").value.trim();
+    const message = document.getElementById("message").value.trim();
+
+    const gmailURL =
+        "https://mail.google.com/mail/?view=cm&fs=1" +
+        "&to=sclerendev@gmail.com" +
+        "&su=" + encodeURIComponent(`[INQUIRY] ${subject}`) +
+        "&body=" + encodeURIComponent(
+            `From: ${email}\n\nInquiry Type:\n${subject}\n\nMessage:\n${message}`
+        );
+
+    window.open(gmailURL, "_blank");
+}
+
+function copyEmail(e) {
+    e.preventDefault();
+
+    const email = "sclerendev@gmail.com";
+
+    // Modern clipboard (works on most mobile browsers)
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(email)
+            .then(() => showCopyToast("Copied to clipboard"))
+            .catch(() => legacyCopy(email));
+    } else {
+        // iOS / older fallback
+        legacyCopy(email);
+    }
+}
+
+function legacyCopy(text) {
+    const tempInput = document.createElement("input");
+    tempInput.value = text;
+    document.body.appendChild(tempInput);
+
+    tempInput.select();
+    tempInput.setSelectionRange(0, 99999); // iOS fix
+
+    try {
+        document.execCommand("copy");
+        showCopyToast("Copied to clipboard");
+    } catch {
+        showCopyToast("Tap & hold to copy");
+    }
+
+    document.body.removeChild(tempInput);
+}
+
+function showCopyToast(message) {
+    const toast = document.createElement("div");
+    toast.textContent = message;
+
+    toast.style.position = "fixed";
+    toast.style.bottom = "80px";               // higher for thumbs
+    toast.style.left = "50%";
+    toast.style.transform = "translateX(-50%)";
+    toast.style.background = "rgba(15,15,15,0.95)";
+    toast.style.color = "#fffd98";
+    toast.style.padding = "14px 22px";         // touch-friendly
+    toast.style.borderRadius = "10px";
+    toast.style.fontFamily = "IBM Plex Mono, monospace";
+    toast.style.fontSize = "14px";
+    toast.style.letterSpacing = "0.05em";
+    toast.style.zIndex = "9999";
+    toast.style.boxShadow = "0 8px 30px rgba(0,0,0,0.5)";
+    toast.style.opacity = "0";
+    toast.style.transition = "opacity 0.25s ease, transform 0.25s ease";
+    toast.style.pointerEvents = "none";
+
+    document.body.appendChild(toast);
+
+    requestAnimationFrame(() => {
+        toast.style.opacity = "1";
+        toast.style.transform = "translateX(-50%) translateY(-6px)";
+    });
+
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateX(-50%) translateY(0)";
+        setTimeout(() => toast.remove(), 300);
+    }, 1400);
+}

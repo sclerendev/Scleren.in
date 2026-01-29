@@ -15,40 +15,40 @@
   <div id="bg"></div>
   <div class="zoom-overlay"></div>
 
-  <!-- Navigation consistent with main site -->
+  <!-- Navigation -->
   <div class="top-ribbon at-top">
-  <div class="ribbon-inner">
-    
-    <div class="ribbon-brand">
-      <a href="index.html" class="logo-small">SCLEREN</a>
-      <span class="system-status">
-        <span class="status-dot"></span> 
-        <span class="page-id">INQUIRY.EXE</span> </span>
-    </div>
-
-    <nav class="ribbon-nav">
-      <a href="index.html" class="nav-link-minimal">
-        <span class="nav-arrow">←</span> Home
-      </a>
-    </nav>
-
-    <div class="menu-wrapper">
-      <div class="menu-dots" id="menuToggle">
-        <span></span><span></span><span></span>
-      </div>
+    <div class="ribbon-inner">
       
-      <div class="menu-dropdown" id="menuDropdown">
-        <a href="index.html">01. HOME</a>
-        <a href="about.html">02. ABOUT Studio</a>
-        <a href="games.html">03. GAMES</a>
-        <a href="services.html">04. SERVICES</a>
-        <a href="inquiry.html">05. CONTACT</a>
+      <div class="ribbon-brand">
+        <a href="index.html" class="logo-small">SCLEREN</a>
+        <span class="system-status">
+          <span class="status-dot"></span> 
+          <span class="page-id">INQUIRY.EXE</span>
+        </span>
       </div>
-    </div>
 
+      <nav class="ribbon-nav">
+        <a href="index.html" class="nav-link-minimal">
+          <span class="nav-arrow">←</span> Home
+        </a>
+      </nav>
+
+      <div class="menu-wrapper">
+        <div class="menu-dots" id="menuToggle">
+          <span></span><span></span><span></span>
+        </div>
+        
+        <div class="menu-dropdown" id="menuDropdown">
+          <a href="index.html">01. HOME</a>
+          <a href="about.html">02. ABOUT Studio</a>
+          <a href="games.html">03. GAMES</a>
+          <a href="services.html">04. SERVICES</a>
+          <a href="inquiry.html">05. CONTACT</a>
+        </div>
+      </div>
+
+    </div>
   </div>
-</div>
-</div>
 
   <main class="content monolith">
 
@@ -57,81 +57,95 @@
       <span>2026</span>
     </div>
 
-    <h1 class="mono-title">ESTABLISH<br/>SECURE CHANNEL</h1>
+    <h1 class="mono-title">
+  <span class="title-primary">ESTABLISH</span><br/>
+  <span class="title-secondary">SECURE CHANNEL</span>
+</h1>
 
-    <div class="mono-meta">STATUS: AWAITING CONNECTION • CONFIDENTIAL</div>
+
+    <div class="mono-meta">
+      STATUS: ACCEPTING SELECT INQUIRIES • CONFIDENTIAL
+    </div>
 
     <p class="mono-lead">
-      Strategic partnerships • Technical consulting • High-signal collaborations only.
+      Game collaborations • In-game promotions • Technical consulting • Game Suggestions
     </p>
 
     <p class="mono-body">
-      Currently accepting select inquiries from individuals and organizations seeking deep technical collaboration, 
-      systems architecture advisory, or early-stage product co-development.<br><br>
-      
-      <strong>Expected first response:</strong> within 48–72 hours (business days).<br>
-      <strong>High-priority / time-sensitive:</strong> please include [URGENT] in subject line.
+      This channel is for studios, developers, publishers, and brands seeking
+      focused collaboration with Scleren.<br><br>
+
+      Valid inquiries include:
+      game co-development, systems or gameplay consulting, engine-level support,
+      and in-game brand or product integrations that respect player experience
+      and game design integrity.<br><br>
+
+      <strong>Response window:</strong> 48–72 business hours.<br>
+      <strong>Time-critical matters:</strong> include <strong>[URGENT]</strong> in the subject line.
     </p>
 
-    <!-- Primary contact method – most professional & spam-resistant -->
+    <!-- Primary contact -->
     <section class="mono-section uplink">
       <h2 class="mono-subtitle">UPLINK PROTOCOL</h2>
       
       <div class="contact-block">
-        <div class="contact-label">DESTINATION</div>
-        <a href="mailto:sclerendev@gmail.com?subject=[INQUIRY]" class="mono-address">
-          sclerendev@gmail.com
-        </a>
-        <div class="contact-hint">Preferred method. Use clear subject line.</div>
+        <div class="contact-label">PRIMARY CHANNEL</div>
+        <a href="#" class="mono-address" onclick="copyEmail(event)">
+           sclerendev@gmail.com
+         </a>
+
+        <div class="contact-hint">
+          Recommended for detailed proposals, decks, or collaboration outlines.
+        </div>
       </div>
 
       <div class="contact-block secondary">
-        <div class="contact-label">ALTERNATE CHANNEL</div>
-        <p class="mono-address inactive">[Secure messaging / calendly link coming soon]</p>
-        <div class="contact-hint dim">Matrix / Signal / Keybase — upon mutual agreement</div>
+        <div class="contact-label">SECONDARY CHANNEL</div>
+        <p class="mono-address inactive">
+          [Direct scheduling / secure messaging — forthcoming]
+        </p>
+        <div class="contact-hint dim">
+          Enabled after initial alignment. NDA-safe channels available.
+        </div>
       </div>
     </section>
 
-    <!-- Optional micro-form for very low-friction inquiries -->
-    <section class="mono-section form-section">
-      <h2 class="mono-subtitle">QUICK PING</h2>
-      <p class="mono-meta small">For very brief initial outreach (1–2 sentences max)</p>
+    <!-- Quick form -->
+<section class="mono-section form-section">
+  <h2 class="mono-subtitle">QUICK PING</h2>
+  <p class="mono-meta small">
+    Short signal only — initial context before a full discussion
+  </p>
 
-      <form class="terminal-form" action="https://formspree.io/f/your-form-id" method="POST">
-        <label class="form-label">ORIGIN:</label>
-        <input type="email" name="email" placeholder="your@domain.com" required autocomplete="email">
+  <form class="terminal-form" onsubmit="openGmail(event)">
+    <label class="form-label">CONTACT:</label>
+    <input type="email" id="email" placeholder="you@studio.com" required autocomplete="email">
 
-        <label class="form-label">SUBJECT:</label>
-        <input type="text" name="_subject" placeholder="Partnership / Consulting / Other" required>
+    <label class="form-label">INQUIRY TYPE:</label>
+    <input type="text" id="subject" placeholder="Game Collaboration / In-Game Promotion / Consulting" required>
 
-        <label class="form-label">PAYLOAD:</label>
-        <textarea name="message" rows="5" placeholder="Brief overview of your inquiry... (Markdown supported)" required></textarea>
+    <label class="form-label">SUMMARY:</label>
+    <textarea id="message" rows="5" placeholder="Your project overview, needs, ideas, collaboration or promotion interests, and why Scleren fits." required></textarea>
 
-        <!-- Honeypot spam protection -->
-        <input type="text" name="_gotcha" style="display:none">
+    <button type="submit" class="btn-cyber"><span class="btn-text">OPEN MAIL CLIENT →</span><div class="btn-glitch"></div></button>
+  </form>
+</section>
 
-        <button type="submit" class="btn-cyber">TRANSMIT →</button>
-      </form>
-    </section>
-
-    <div class="mono-action">
-      <a href="mailto:sclerendev@gmail.com?subject=[INQUIRY]">OPEN MAIL CLIENT →</a>
-    </div>
 
   </main>
 
   <!-- Bottom Navigation -->
-    <div class="page-navigation" style="margin: 140px auto 100px; max-width: 1100px; padding: 0 30px;">
-      <div style="display: flex; gap: 32px; flex-wrap: wrap; justify-content: center;">
-        <a href="index.html"     class="btn-outline">← Home</a>
-        <a href="about.html"     class="btn-outline">← About Studio</a>
-        <a href="games.html"  class="btn-outline">← Games</a>
-        <a href="services.html"   class="btn-outline">← Services</a>
-      </div>
+  <div class="page-navigation" style="margin: 140px auto 100px; max-width: 1100px; padding: 0 30px;">
+    <div style="display: flex; gap: 32px; flex-wrap: wrap; justify-content: center;">
+      <a href="index.html" class="btn-outline">← Home</a>
+      <a href="about.html" class="btn-outline">← About Studio</a>
+      <a href="games.html" class="btn-outline">← Games</a>
+      <a href="services.html" class="btn-outline">← Services</a>
     </div>
+  </div>
 
   <footer>
-    <p>© 2026 Scleren Developer • Classified Transmission</p>
+    <p>© 2026 Scleren Developer • Secure Channel Closed</p>
   </footer>
 
   <script src="script.js"></script>

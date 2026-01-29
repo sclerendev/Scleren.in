@@ -1048,12 +1048,36 @@ body.is-home .ribbon-nav {
 /* Title */
 .mono-title {
   font-size: clamp(3.8rem, 9vw, 6.5rem);
-  font-weight: 800;
+  font-weight: 1000;
   letter-spacing: -3px;
   line-height: 0.9;
   text-transform: uppercase;
   margin-bottom: 30px;
 }
+
+/* Default (no glow) */
+.mono-title span {
+  transition: text-shadow 0.35s ease, color 0.35s ease;
+}
+
+/* First word – white glow on hover */
+.mono-title:hover .title-primary {
+  color: #ffffff;
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.35),
+    0 0 18px rgba(255, 255, 255, 0.25),
+    0 0 32px rgba(255, 255, 255, 0.15);
+}
+
+/* Remaining words – gold glow on hover */
+.mono-title:hover .title-secondary {
+  color: #fffd98;
+  text-shadow:
+    0 0 8px rgba(255, 253, 152, 0.45),
+    0 0 18px rgba(255, 253, 152, 0.3),
+    0 0 36px rgba(255, 253, 152, 0.18);
+}
+
 
 /* Meta */
 .mono-meta {
@@ -1068,7 +1092,7 @@ body.is-home .ribbon-nav {
 .mono-lead {
   font-size: 1.45rem;
   line-height: 1.6;
-  max-width: 720px;
+  max-width: 1000px;
   margin-bottom: 30px;
 }
 
@@ -1838,4 +1862,26 @@ footer {
 
     transform-origin: top right;
   }
+}
+
+/* GLOBAL VIEWPORT CONTAINMENT – HARD SAFETY NET */
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip; /* better than hidden – no scrollbars, no reflow */
+}
+
+*,
+*::before,
+*::after {
+  max-width: 100vw;
+  box-sizing: border-box;
+}
+
+/* Prevent glow + scale effects from forcing scrollbars */
+.section,
+.hero-unique,
+.monolith,
+.game-card {
+  overflow: clip;
 }
