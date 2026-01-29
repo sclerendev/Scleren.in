@@ -173,31 +173,36 @@ document.addEventListener('DOMContentLoaded', () => {
     /* -----------------------------------------------
         5. HERO SPLIT SYSTEM
     ----------------------------------------------- */
-    const exploreTrigger = document.getElementById("exploreTrigger");
-    const heroContainer = document.getElementById("heroActionContainer");
+   const exploreTrigger = document.getElementById("exploreTrigger");
+const heroContainer  = document.getElementById("heroActionContainer");
+const floatParent    = heroContainer?.closest(".btn-float");
 
-    if (exploreTrigger && heroContainer) {
-        exploreTrigger.addEventListener("click", e => {
-            e.preventDefault();
-            e.stopPropagation();
-            heroContainer.classList.toggle("active");
+if (exploreTrigger && heroContainer && floatParent) {
 
-            const parent = heroContainer.closest(".btn-float");
-            if (parent) {
-                parent.style.transform = heroContainer.classList.contains("active")
-                    ? "rotate(0deg)"
-                    : "rotate(-90deg)";
-            }
-        });
+  // Toggle on button click
+  exploreTrigger.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
 
-        document.addEventListener("click", e => {
-            if (!heroContainer.contains(e.target)) {
-                heroContainer.classList.remove("active");
-                const parent = heroContainer.closest(".btn-float");
-                if (parent) parent.style.transform = "rotate(-90deg)";
-            }
-        });
+    const isActive = heroContainer.classList.toggle("active");
+    floatParent.classList.toggle("active", isActive);
+  });
+
+  // Close when clicking outside
+  document.addEventListener("click", (e) => {
+    if (!heroContainer.contains(e.target) && !exploreTrigger.contains(e.target)) {
+      heroContainer.classList.remove("active");
+      floatParent.classList.remove("active");
     }
+  });
+}
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    heroContainer.classList.remove("active");
+    floatParent.classList.remove("active");
+  }
+});
+
 
     /* -----------------------------------------------
         6. HERO TITLE LADDER EFFECT
@@ -212,6 +217,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 });
+
+
 
 /* -----------------------------------------------
     7. GMAIL OPEN FUNCTION (INQUIRY PAGE)
@@ -302,3 +309,20 @@ function showCopyToast(message) {
         setTimeout(() => toast.remove(), 300);
     }, 1400);
 }
+
+/* ENSURE READ LESS ALWAYS COLLAPSES */
+document.addEventListener("click", function (e) {
+  const btn = e.target.closest(".read-toggle");
+  if (!btn) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const card = btn.closest(".game-card");
+
+  if (btn.classList.contains("read-less")) {
+    card.classList.remove("active");
+  } else {
+    card.classList.add("active");
+  }
+});

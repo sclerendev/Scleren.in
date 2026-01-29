@@ -517,7 +517,9 @@ body.is-home .ribbon-nav {
 
 
 .hero-title {
-  font-size: clamp(3rem, 10vw, 7rem);
+  font-size: clamp(2.8rem, 8vw, 6rem); /* smaller */
+
+
   font-weight: 800;
   letter-spacing: 4px;
   line-height: 1;
@@ -546,12 +548,164 @@ body.is-home .ribbon-nav {
   animation-delay: var(--card-delay, 0s);
 }
 
+/* ================================
+   READ MORE / LESS – MOBILE ONLY
+================================ */
+
+/* Base button style */
+.read-more-btn {
+  display: none; /* hidden by default (desktop) */
+  margin-top: 14px;
+  background: transparent;
+  border: 1px solid var(--border-gold);
+  color: var(--gold-primary);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  padding: 10px 18px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.read-more-btn:hover {
+  background: var(--gold-glow);
+}
+
+/* Mobile only */
+@media (hover: none) and (max-width: 768px) {
+  .read-more-btn {
+    display: inline-flex;
+    align-self: flex-start;
+  }
+
+  /* Default state */
+  .game-card .read-less {
+    display: none;
+  }
+
+  /* When expanded */
+  .game-card.active .read-more {
+    display: none;
+  }
+
+  .game-card.active .read-less {
+    display: inline-flex;
+  }
+}
+
 @keyframes cardEnter {
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
+
+/* ================================
+   READ EXPAND / READ LESS – SIGNATURE
+================================ */
+
+.read-toggle {
+  position: relative;
+  display: none; /* still mobile only */
+  margin-top: 18px;
+  padding: 12px 26px;
+  opacity: 1;
+  background: rgba(8, 8, 8, 0.75);
+  color: var(--gold-primary);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  border: 1px solid var(--border-gold);
+  clip-path: polygon(
+    10px 0,
+    100% 0,
+    100% calc(100% - 10px),
+    calc(100% - 10px) 100%,
+    0 100%,
+    0 10px
+  );
+  cursor: pointer;
+  overflow: hidden;
+  isolation: isolate;
+  transition:
+    color 0.35s ease,
+    border-color 0.35s ease,
+    transform 0.35s var(--ease-out),
+    opacity 0.25s ease;
+}
+
+
+
+/* Inner text layer */
+.read-toggle span {
+  position: relative;
+  z-index: 2;
+  transition: transform 0.35s var(--ease-out);
+}
+
+/* Sweep glow */
+.read-toggle::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    rgba(255, 253, 152, 0.35) 50%,
+    transparent 100%
+  );
+  transform: translateX(-120%);
+  transition: transform 0.6s ease;
+  z-index: 1;
+}
+
+/* Hover feedback (mobile long-press compatible) */
+.read-toggle:hover::before {
+  transform: translateX(120%);
+}
+
+.read-toggle:hover span {
+  transform: translateX(3px);
+}
+
+/* READ LESS variant */
+.read-less {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+@media (hover: none) and (max-width: 768px) {
+  .read-toggle {
+    display: inline-flex;
+    align-self: flex-start;
+  }
+
+  /* default state */
+  .read-less {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-4px);
+  }
+
+  /* expanded state */
+  .game-card.active .read-more {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(4px);
+  }
+
+  .game-card.active .read-less {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+}
+
+
+
+
 
 .game-card:hover {
   transform: translateY(-12px);
@@ -573,14 +727,50 @@ body.is-home .ribbon-nav {
   opacity: 0.35;
 }
 
+/* Hover state — THIS expands the card */
+.game-card:hover .card-content {
+  grid-template-rows: auto auto 1fr auto;
+}
+
+.game-card:hover .game-expand > .expand-inner {
+  opacity: 1;
+  transform: translateY(0);
+}
 .card-content {
   position: relative;
   z-index: 2;
   padding: 2.2rem 2rem 2.4rem;
-  display: flex;
+  display: grid;
   flex-direction: column;
+  grid-template-rows: auto auto 0fr auto;
   height: 100%;
+ transition: grid-template-rows 0.9s cubic-bezier(.16,1,.3,1);
 }
+
+/* Desktop hover OR mobile tap */
+.game-card:hover .card-content,
+.game-card.active .card-content {
+  grid-template-rows: auto auto 1fr auto;
+}
+
+.game-card:hover .game-expand > .expand-inner,
+.game-card.active .game-expand > .expand-inner {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Mobile default collapsed */
+@media (hover: none) {
+  .game-expand {
+    max-height: 0;
+    overflow: hidden;
+  }
+
+  .game-card.active .game-expand {
+    max-height: 600px; /* safe ceiling */
+  }
+}
+
 
 .status-tag {
   position: absolute;
@@ -800,7 +990,7 @@ body.is-home .ribbon-nav {
 }
 
 .hero-unique .hero-title {
-  font-size: clamp(4rem, 11vw, 9rem);
+  font-size: clamp(2.5rem, 11vw, 9rem);
   line-height: 0.85;
   text-align: left;
   letter-spacing: -4px;
@@ -828,6 +1018,7 @@ body.is-home .ribbon-nav {
   right: 0;
   transform: rotate(-90deg);
   transform-origin: right bottom;
+  transition: transform 0.4s var(--ease-out);
 }
 
 /* Subtle entrance animation */
@@ -1335,6 +1526,7 @@ footer {
   text-align: right;
   color: var(--text-muted);
   font-size: 0.8rem;
+  padding-bottom: 160px;
 }
 
 .about-actions {
@@ -1541,6 +1733,11 @@ footer {
   gap: 20px;
   text-decoration: none;
   
+}
+.explore-projects-fixed.hide {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px);
 }
 
 .explore-circle {
@@ -1753,36 +1950,28 @@ footer {
   letter-spacing: 0.1em;
 }
 
+/* expandable container */
+/* expandable section */
 .game-expand {
   max-height: 0;
-  opacity: 0;
   overflow: hidden;
-
-  transform: translateY(8px);
+  opacity: 0;
   transition:
-    max-height 0.6s ease,
-    opacity 0.4s ease,
-    transform 0.4s ease;
-
-  will-change: max-height, opacity, transform;
+    max-height 0.8s cubic-bezier(.16,1,.3,1),
+    opacity 0.4s ease;
 }
 
 
 .game-card:hover {
   transform: translateY(-8px);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  grid-template-rows: auto 1fr;
+
 }
 
 .game-desc {
   color: #e0e0e0;
   margin-bottom: 12px;
-}
-
-.game-expand {
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  transition: max-height 0.5s ease, opacity 1s ease;
 }
 
 .game-expand::before {
@@ -1796,14 +1985,27 @@ footer {
     rgba(255,255,255,0)
   );
 }
+@media (hover: none) {
+  .game-card:not(.active) .game-expand {
+    max-height: 0 !important;
+    opacity: 0 !important;
+    overflow: hidden;
+  }
+}
 
+/* hover reveal */
+.game-card:hover .game-expand,
+.game-card.active .game-expand {
+  max-height: 800px; /* safe limit */
+  opacity: 1;
+}
 
-.game-card:hover .game-expand {
-  max-height: 420px; /* keep your value, just a touch safer */
+/* REQUIRED inner wrapper */
+.game-card:hover .game-expand > .expand-inner,
+.game-card.active .game-expand > .expand-inner {
   opacity: 1;
   transform: translateY(0);
 }
-
 
 .game-expand p {
   color: #bfbfbf;
@@ -1827,16 +2029,11 @@ footer {
   color: #cfcfcf;
 }
 
-@media (hover: hover) {
-  .game-card:hover .game-expand {
-    max-height: 400px;
-    opacity: 1;
-  }
-}
+
 
 @media (hover: none) {
   .game-expand {
-    max-height: none;
+    max-height: 0;
     opacity: 1;
     transform: none;
   }

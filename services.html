@@ -79,8 +79,11 @@
     <p class="game-desc">
       Collaborations with creators and studios to integrate assets into live and upcoming game projects.
     </p>
-
+        <button class="read-toggle read-more">
+  <span>Read expand</span>
+</button>
     <div class="game-expand">
+        <div class="expand-inner">
       <p>
         We collaborate with creators and studios who want their assets featured inside real game environments.
 
@@ -99,6 +102,7 @@
        featured inside gameplay environments. This includes road cars, concept vehicles, and custom builds.
 
       </p>
+      </div>  
     </div>
 
     <div class="game-tags">
@@ -107,8 +111,11 @@
       <span>Characters</span>
       <span>Optimization</span>
     </div>
+    <button class="read-toggle read-less">
+  <span>Read less</span>
+</button>
   </div>
-</div>
+  </div>
 
 
 
@@ -116,7 +123,7 @@
       </div>
     </div>
 
-    <div class="game-card" style="--card-delay: 0.25s">
+    <div class="game-card" ontouchstart="this.classList.toggle('active')" style="--card-delay: 0.25s">
       <div class="card-glow"></div>
       <div class="card-content">
         
@@ -125,7 +132,11 @@
           Brands are integrated as part of the game’s systems and world logic — never as forced overlays.
 Every placement is designed to respect immersion, player behavior, and long-term brand value.
         </p>
+       <button class="read-toggle read-more">
+  <span>Read expand</span>
+</button>
         <div class="game-expand">
+            <div class="expand-inner">
   <p>
     Brand integrations are designed as part of the game system itself — not
     layered on after production. We embed brands only where they align with
@@ -145,6 +156,7 @@ Every placement is designed to respect immersion, player behavior, and long-term
     play sessions, and delivers value without compromising the integrity of the
     game world or the brand itself.
   </p>
+ </div>
 </div>
 
         <div class="game-tags">
@@ -152,9 +164,12 @@ Every placement is designed to respect immersion, player behavior, and long-term
           <span>Product Placement</span>
           <span>Dynamic Ads</span>
           </div>
-        
+        <button class="read-toggle read-less">
+  <span>Read less</span>
+</button>
       </div>
     </div>
+    
     
 
     <!-- Optional third card placeholder -->
