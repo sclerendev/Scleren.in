@@ -175,33 +175,28 @@ document.addEventListener('DOMContentLoaded', () => {
     ----------------------------------------------- */
    const exploreTrigger = document.getElementById("exploreTrigger");
 const heroContainer  = document.getElementById("heroActionContainer");
-const floatParent    = heroContainer?.closest(".btn-float");
 
-if (exploreTrigger && heroContainer && floatParent) {
+if (exploreTrigger && heroContainer) {
 
-  // Toggle on button click
   exploreTrigger.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopPropagation();
-
-    const isActive = heroContainer.classList.toggle("active");
-    floatParent.classList.toggle("active", isActive);
+    heroContainer.classList.toggle("active");
   });
 
-  // Close when clicking outside
   document.addEventListener("click", (e) => {
-    if (!heroContainer.contains(e.target) && !exploreTrigger.contains(e.target)) {
+    if (!heroContainer.contains(e.target)) {
       heroContainer.classList.remove("active");
-      floatParent.classList.remove("active");
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      heroContainer.classList.remove("active");
     }
   });
 }
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    heroContainer.classList.remove("active");
-    floatParent.classList.remove("active");
-  }
-});
+
 
 
     /* -----------------------------------------------
